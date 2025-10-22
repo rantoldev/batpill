@@ -22,7 +22,7 @@
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, db } from '../firebase'
 import { store } from '../store'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { authErrorMessage } from '../utils/errorMessages'
 export default {
   data() {

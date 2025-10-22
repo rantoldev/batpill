@@ -53,20 +53,23 @@ export async function generateShareImage({ username = 'Player', score = 0, medal
   // small footer
   ctx.fillStyle = 'rgba(255,255,255,0.7)'
   ctx.font = '400 20px "Segoe UI", Roboto, Arial'
-  ctx.fillText('Play now — pillfly.pump.fun', 64, height - 48)
+  ctx.fillText('Play now — Pillfly on pump.fun', 64, height - 48)
 
   return await new Promise((res) => canvas.toBlob(res, 'image/png'))
 }
 
 export async function shareImageAndText({ text = '', blob = null } = {}) {
-  // Always open X intent with the text and open generated image in a new tab.
-  // This avoids triggering the OS-level share dialog on desktops.
+  // Use the requested static share image if available and open tweet composer with text
   const intentUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`
   window.open(intentUrl, '_blank')
-  if (blob) {
-    const url = URL.createObjectURL(blob)
-    // open image in new tab so user can save/drag it to the tweet composer
-    window.open(url, '_blank')
+  try {
+    const imgUrl = new URL('../images/x-share.png', import.meta.url).href
+    window.open(imgUrl, '_blank')
+  } catch (e) {
+    if (blob) {
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+    }
   }
   return { shared: false }
 }

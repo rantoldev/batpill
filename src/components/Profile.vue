@@ -6,6 +6,7 @@
         <h2>Profile</h2>
       </div>
       <div v-if="userDoc" class="card-body">
+        <div v-if="saveMessage" :class="['username-success', saveMessage ? 'show' : '']">{{ saveMessage }}</div>
         <label>Username</label>
         <input v-model="userDoc.username" class="username-input" />
 
@@ -42,7 +43,7 @@ import { store } from '../store'
 
 export default {
   data() {
-    return { userDoc: null }
+    return { userDoc: null, saveMessage: '' }
   },
   async mounted() {
     const user = auth.currentUser
@@ -80,6 +81,11 @@ export default {
       await updateDoc(ref, { username: this.userDoc.username })
       // update store
       store.user = Object.assign({}, store.user, { username: this.userDoc.username })
+      // show success message briefly with smooth transitions
+      this.saveMessage = 'Username updated successfully!'
+      // also use global toast for visibility
+      store.showToast('Username updated successfully!', 0)
+      setTimeout(() => { this.saveMessage = '' }, 3000)
     }
   }
 }
@@ -99,6 +105,9 @@ export default {
 .stat-value{font-size:32px;font-weight:900;color:#fff}
 .actions{margin-top:40px;display:flex;gap:14px;text-align:center;justify-content:center}
 .loading{color:#ccc;text-align:center;padding:20px}
+
+.username-success{position:fixed;top:84px;right:24px;background:linear-gradient(90deg,#2a2a2a,#1a1a1a);color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.6);opacity:0;transform:translateY(-6px);transition:opacity 300ms ease, transform 300ms ease}
+.username-success.show{opacity:1;transform:translateY(0)}
 
 @media (max-width:640px){
   .profile-card{width:94%}

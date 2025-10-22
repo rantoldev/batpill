@@ -11,11 +11,10 @@
           <h1 class="text-xl font-bold cursor-pointer text-white">PillFly</h1>
         </router-link>
         <!-- Pumpill link placed near left header (approx 300px shift handled by header-shift elsewhere) -->
-        <a href="https://www.pump.fun" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
-          <span class="pump-text">Pumpfly in pump.fun</span>
+        <a href="https://pump.fun/profile/pillfly" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
+          <span class="pump-text">Pillfly in pump.fun</span>
           <img src="@/images/pumpfun logo.png" alt="Pumpfun" class="pump-logo" />
-          
-  </a>
+        </a>
       </div>
 
       <!-- Center: score -->
@@ -24,18 +23,41 @@
           <div class="score-label">SCORE</div>
           <div class="score-value">{{ storeScore }}</div>
         </div>
+        <!-- Medals display: shown when logged in -->
+        <div v-if="store.user" class="medals-pill" style="margin-left:80px;display:flex;align-items:center;">
+          <div class="medal-icon-header" style="margin-right:8px;">🏅</div>
+          <div class="medal-value">{{ store.user.medals || 0 }}</div>
+        </div>
       </div>
 
   <!-- Right: auth actions (shifted left by 300px per request) -->
   <div class="flex-1 flex items-center justify-end space-x-4 header-actions header-shift">
-        <div v-if="!store.user">
-          <router-link to="/login" class="px-3 py-1 btn-secondary">Login</router-link>
-          <router-link to="/register" class="px-3 py-1 btn-secondary">Register</router-link>
+        <div v-if="!store.user" class="guest-actions">
+          <!-- Desktop: text buttons -->
+          <router-link to="/login" class="px-3 py-1 btn-secondary desktop-only">Login</router-link>
+          <router-link to="/register" class="px-3 py-1 btn-secondary desktop-only" style="margin-left:10px">Register</router-link>
+
+          <!-- Mobile: compact icon buttons -->
+          <router-link to="/login" class="mobile-icon" aria-label="Login">
+            <button class="icon-btn" title="Login">🔐</button>
+          </router-link>
+          <router-link to="/register" class="mobile-icon" aria-label="Register">
+            <button class="icon-btn" title="Register">✍️</button>
+          </router-link>
         </div>
         <div v-else class="flex items-center space-x-3">
-          <div class="text-white px-2 py-1">{{ store.user.username || 'Player' }}</div>
-          <router-link to="/profile" class="px-3 py-1 btn-secondary">Profile</router-link>
-          <button @click="logout" class="px-3 py-1 btn-secondary">Logout</button>
+          <!-- username hidden on very small screens to save space -->
+          <div class="text-white px-2 py-1 username">{{ store.user.username || 'Player' }}</div>
+
+          <!-- Desktop: text links -->
+          <router-link to="/profile" class="px-3 py-1 btn-secondary desktop-only">Profile</router-link>
+          <button @click="logout" class="px-3 py-1 btn-secondary desktop-only">Logout</button>
+
+          <!-- Mobile: compact icons -->
+          <router-link to="/profile" class="mobile-icon" aria-label="Profile">
+            <button class="icon-btn" title="Profile">👤</button>
+          </router-link>
+          <button @click="logout" class="mobile-icon icon-btn" title="Logout" aria-label="Logout">🚪</button>
         </div>
       </div>
     </nav>
@@ -110,7 +132,8 @@ export default {
 .bg-loop {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 5; /* sit above page background so stars are visible behind overlays */
+  /* keep sky always black */
   background-color: #000;
   pointer-events: none;
 }
@@ -121,13 +144,16 @@ export default {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle 1px at 10% 20%, rgba(255, 255, 255, 0.6) 0, transparent 1px),
-    radial-gradient(circle 1px at 50% 40%, rgba(255, 255, 255, 0.6) 0, transparent 1px),
-    radial-gradient(circle 1px at 80% 70%, rgba(255, 255, 255, 0.6) 0, transparent 1px),
-    radial-gradient(circle 1px at 30% 80%, rgba(255, 255, 255, 0.6) 0, transparent 1px);
-  background-size: 200px 200px;
-  animation: stars 30s linear infinite;
+    radial-gradient(circle 1px at 10% 20%, rgba(255,255,255,0.9) 0, transparent 1px),
+    radial-gradient(circle 1px at 25% 35%, rgba(255,255,255,0.85) 0, transparent 1px),
+    radial-gradient(circle 1px at 40% 60%, rgba(255,255,255,0.9) 0, transparent 1px),
+    radial-gradient(circle 1px at 55% 18%, rgba(255,255,255,0.8) 0, transparent 1px),
+    radial-gradient(circle 1px at 70% 50%, rgba(255,255,255,0.85) 0, transparent 1px),
+    radial-gradient(circle 1px at 85% 75%, rgba(255,255,255,0.9) 0, transparent 1px);
+  background-size: 220px 220px; /* larger tiles = fewer stars */
+  animation: stars 26s linear infinite;
   opacity: 0.6;
+  mix-blend-mode: screen;
 }
 
 /* Slower-moving larger stars layer */
@@ -136,13 +162,15 @@ export default {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle 2px at 20% 30%, rgba(255, 255, 255, 0.8) 0, transparent 2px),
-    radial-gradient(circle 2px at 60% 50%, rgba(255, 255, 255, 0.8) 0, transparent 2px),
-    radial-gradient(circle 2px at 90% 10%, rgba(255, 255, 255, 0.8) 0, transparent 2px),
-    radial-gradient(circle 2px at 40% 90%, rgba(255, 255, 255, 0.8) 0, transparent 2px);
-  background-size: 300px 300px;
-  animation: stars-slow 60s linear infinite;
-  opacity: 0.8;
+    radial-gradient(circle 2px at 8% 20%, rgba(255,255,255,0.95) 0, transparent 2px),
+    radial-gradient(circle 2px at 28% 45%, rgba(255,255,255,0.9) 0, transparent 2px),
+    radial-gradient(circle 2px at 48% 70%, rgba(255,255,255,0.95) 0, transparent 2px),
+    radial-gradient(circle 2px at 68% 15%, rgba(255,255,255,0.9) 0, transparent 2px),
+    radial-gradient(circle 2px at 88% 82%, rgba(255,255,255,0.95) 0, transparent 2px);
+  background-size: 320px 320px; /* fewer larger stars */
+  animation: stars-slow 56s linear infinite;
+  opacity: 0.7;
+  mix-blend-mode: screen;
 }
 
 @keyframes stars {
@@ -171,9 +199,9 @@ export default {
   backdrop-filter: blur(6px);
 }
 
-/* Shift header actions left by 300px */
+/* Shift header actions left by 300px, then nudge the username/profile/logout group 50px to the right */
 .header-shift {
-  transform: translateX(-300px);
+  transform: translateX(-250px); /* previously -300px, moved 50px right */
 }
 
 /* ensure exactly 10px spacing between action items in header */
@@ -226,5 +254,45 @@ export default {
   color: #fff;
   font-weight: bold;
   text-transform: uppercase;
+}
+
+.medals-pill{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:8px;color:#fff}
+.medal-icon-header{font-size:18px}
+.medal-value{font-weight:800;margin-left:4px}
+
+/* Mobile-specific header tweaks */
+/* hide the pump text on small screens but keep the logo clickable */
+.pump-link .pump-text { display: inline-block; }
+.pump-link .pump-logo { width: 36px; height: 20px; margin-left:8px }
+
+/* desktop-only helpers */
+.desktop-only { display: inline-flex; }
+.mobile-icon { display: none; }
+
+/* compact icon button */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  padding: 6px;
+  border-radius: 6px;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.04); }
+
+@media (max-width: 640px) {
+  /* hide pump text on small screens */
+  .pump-link .pump-text { display: none; }
+
+  /* hide desktop text buttons, show mobile icons */
+  .desktop-only { display: none !important; }
+  .mobile-icon { display: inline-flex !important; }
+
+  /* hide username text to save space */
+  .username { display: none; }
+
+  /* reduce header padding and logo size on very small screens */
+  .header-bar { padding: 8px; }
+  .logo-img { width: 40px; height: 40px; }
 }
 </style>

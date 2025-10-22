@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '../firebase'
 import { doc, setDoc } from 'firebase/firestore'
 import { store } from '../store'
@@ -36,6 +36,8 @@ export default {
       try {
         const userCred = await createUserWithEmailAndPassword(auth, this.email, this.password)
   const uid = userCred.user.uid
+  // set Firebase user displayName for consistency
+  try { await updateProfile(userCred.user, { displayName: this.username }) } catch(e){}
   // include email to make it easy to find users in Firestore
   await setDoc(doc(db, 'users', uid), { username: this.username, email: this.email, totalScore: 0, medals: 0 })
   store.user = { uid, username: this.username, email: this.email, totalScore: 0, medals: 0 }

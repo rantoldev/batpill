@@ -14,7 +14,7 @@ export const store = reactive({
     this.toast.text = text
     this.toast.medalDelta = medalDelta
     this.toast.show = true
-    // hide after 2s
-    setTimeout(() => { this.toast.show = false }, 2000)
+    // hide after 3s
+    setTimeout(() => { this.toast.show = false }, 3000)
   }
 })

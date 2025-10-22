@@ -10,5 +10,16 @@ export function authErrorMessage(e) {
     'auth/invalid-password': "Login details you entered aren't correct!",
     default: null
   }
-  return map[code] || (e && e.message) || 'An unexpected error occurred. Please try again.'
+  if (map[code]) return map[code]
+  // If Firebase returned a verbose message, strip known prefixes and return the core message
+  if (e && e.message) {
+    // remove leading 'Firebase: ' and content in parentheses like (auth/...)
+    let m = e.message.replace(/^Firebase:\s*/i, '')
+    m = m.replace(/\(auth\/[^)]+\)/i, '')
+    m = m.replace(/\s*:\s*/g, ': ')
+    m = m.trim()
+    // Avoid returning raw error codes; present a friendly fallback
+    if (m && m.length > 0) return m
+  }
+  return 'An unexpected error occurred. Please try again.'
 }

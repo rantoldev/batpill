@@ -11,7 +11,7 @@
           <h1 class="text-xl font-bold cursor-pointer text-white">PillFly</h1>
         </router-link>
         <!-- Pumpill link placed near left header (approx 300px shift handled by header-shift elsewhere) -->
-        <a href="https://pump.fun/profile/pillfly" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
+        <a href="https://pump.fun/profile/pillflydev" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
           <span class="pump-text">Pillfly in pump.fun</span>
           <img src="@/images/pumpfun logo.png" alt="Pumpfun" class="pump-logo" />
         </a>

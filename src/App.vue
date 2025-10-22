@@ -151,7 +151,9 @@ export default {
     radial-gradient(circle 1px at 70% 50%, rgba(255,255,255,0.85) 0, transparent 1px),
     radial-gradient(circle 1px at 85% 75%, rgba(255,255,255,0.9) 0, transparent 1px);
   background-size: 220px 220px; /* larger tiles = fewer stars */
-  animation: stars 26s linear infinite;
+  /* animate background-position and also transform as a mobile-friendly fallback */
+  animation: stars 26s linear infinite, stars-fall-fast 18s linear infinite;
+  will-change: transform, background-position;
   opacity: 0.6;
   mix-blend-mode: screen;
 }
@@ -168,7 +170,9 @@ export default {
     radial-gradient(circle 2px at 68% 15%, rgba(255,255,255,0.9) 0, transparent 2px),
     radial-gradient(circle 2px at 88% 82%, rgba(255,255,255,0.95) 0, transparent 2px);
   background-size: 320px 320px; /* fewer larger stars */
-  animation: stars-slow 56s linear infinite;
+  /* animate both background-position and transform for mobile compatibility */
+  animation: stars-slow 56s linear infinite, stars-fall-slow 28s linear infinite;
+  will-change: transform, background-position;
   opacity: 0.7;
   mix-blend-mode: screen;
 }
@@ -181,6 +185,16 @@ export default {
 @keyframes stars-slow {
   from { background-position: 0 0; }
   to { background-position: 0 3000px; }
+}
+
+/* Fallback transform animations for browsers that don't animate background-position on pseudo-elements */
+@keyframes stars-fall-fast {
+  from { transform: translateY(0); }
+  to { transform: translateY(900px); }
+}
+@keyframes stars-fall-slow {
+  from { transform: translateY(0); }
+  to { transform: translateY(1400px); }
 }
 
 :root {
@@ -358,9 +372,12 @@ export default {
 
 /* Ensure buttons inside modals have breathing room */
 .welcome-box .btn, .game-over-box .btn, .game-modal .btn, .modal .btn {
-  padding: 10px 16px !important;
-  min-width: 96px !important;
-  margin: 6px !important;
+  padding: 12px 20px !important;
+  min-width: 120px !important;
+  margin: 8px !important;
+  border-width: 2px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
 }
 
 /* If a specific Game Over element exists, increase its inner spacing */

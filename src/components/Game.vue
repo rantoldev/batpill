@@ -142,6 +142,8 @@ if (this.audio.start) try { this.audio.start.currentTime = 0; this.audio.start.p
 },
     // Touch controls: map finger movement to player movement (drag-ish)
     handleTouchStart(e) {
+      // don't begin touch control if game isn't active
+      if (this.gameOver || this.showWelcome || this.paused) return
       if (!e.touches || e.touches.length === 0) return
       const t = e.touches[0]
       this.touchActive = true
@@ -150,6 +152,8 @@ if (this.audio.start) try { this.audio.start.currentTime = 0; this.audio.start.p
       this.lastTouchY = t.clientY
     },
     handleTouchMove(e) {
+      // block movement when game isn't active
+      if (this.gameOver || this.showWelcome || this.paused) return
       if (!this.touchActive) return
       // find our touch
       let t = null
@@ -181,6 +185,12 @@ if (this.audio.start) try { this.audio.start.currentTime = 0; this.audio.start.p
 startAsPlayer() {
 this.guestMode = false
 this.showWelcome = false
+this.gameOver = false
+this.paused = false
+// center player for current viewport (better for mobile)
+this.player = { x: Math.max(20, Math.floor(window.innerWidth / 2) - 40), y: Math.max(60, Math.floor(window.innerHeight / 2) - 40) }
+this.items = []
+this.score = 0
 // reset live store score for header
 store.setScore(0)
 this.startGame()
@@ -188,6 +198,12 @@ this.startGame()
 startAsGuest() {
 this.guestMode = true
 this.showWelcome = false
+this.gameOver = false
+this.paused = false
+// center player for current viewport (better for mobile)
+this.player = { x: Math.max(20, Math.floor(window.innerWidth / 2) - 40), y: Math.max(60, Math.floor(window.innerHeight / 2) - 40) }
+this.items = []
+this.score = 0
 // reset live store score for header
 store.setScore(0)
 this.startGame()
@@ -710,7 +726,8 @@ restart() {
 clearInterval(this.gameLoop)
 clearInterval(this.spawnLoop)
 if (this.autorestartTimer) { clearTimeout(this.autorestartTimer); this.autorestartTimer = null }
-this.player = { x: 920, y: 725 }
+// center player on restart
+this.player = { x: Math.max(20, Math.floor(window.innerWidth / 2) - 40), y: Math.max(60, Math.floor(window.innerHeight / 2) - 40) }
 this.items = []
 this.score = 0
 this.baseItemSpeed = 2

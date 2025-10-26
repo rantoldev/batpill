@@ -11,7 +11,7 @@
           <h1 class="text-xl font-bold cursor-pointer text-white">batpill</h1>
         </router-link>
         <!-- Pumpill link placed near left header (approx 300px shift handled by header-shift elsewhere) -->
-        <a href="https://pump.fun/profile/batpilldev" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
+        <a href="https://pump.fun/profile/rantoldev" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
           <span class="pump-text">batpill in pump.fun</span>
           <img src="@/images/pumpfun logo.png" alt="Pumpfun" class="pump-logo" />
         </a>

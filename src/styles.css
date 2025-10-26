@@ -161,7 +161,8 @@ main{padding-top:84px}
 	.welcome-box { padding: 1.5rem; max-width: 96%; width: 96%; border-radius: 12px }
 	.welcome-box h2 { font-size: 20px }
 	.welcome-box p { font-size: 12px }
-	.btn-ghost, .btn-secondary { padding: 8px 10px; font-size: 13px }
+	/* Make buttons wider on small screens so text doesn't hug the borders */
+	.btn-ghost, .btn-secondary { padding: 15px 20px; font-size: 15px }
 	.score-value { font-size: 14px }
 	.medal-value { font-size: 13px }
 	.player-sprite { width: var(--player-width) }

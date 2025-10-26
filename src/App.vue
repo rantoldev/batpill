@@ -7,12 +7,12 @@
       <!-- Left: logo/title (clickable) -->
       <div class="flex-1 flex items-center space-x-4">
         <router-link to="/" class="flex items-center space-x-3">
-          <img src="@/gif/pillfly.gif" alt="logo" class="logo-img" />
-          <h1 class="text-xl font-bold cursor-pointer text-white">PillFly</h1>
+          <img src="@/images/batpill.png" alt="logo" class="logo-img" />
+          <h1 class="text-xl font-bold cursor-pointer text-white">batpill</h1>
         </router-link>
         <!-- Pumpill link placed near left header (approx 300px shift handled by header-shift elsewhere) -->
-        <a href="https://pump.fun/profile/pillflydev" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
-          <span class="pump-text">Pillfly in pump.fun</span>
+        <a href="https://pump.fun/profile/batpilldev" target="_blank" class="pump-link pl-16 inline-flex items-center ml-4">
+          <span class="pump-text">batpill in pump.fun</span>
           <img src="@/images/pumpfun logo.png" alt="Pumpfun" class="pump-logo" />
         </a>
       </div>
@@ -73,7 +73,7 @@
     </div>
 
     <footer class="fixed bottom-0 left-0 right-0 p-2 footer-bar text-sm text-center z-30">
-      <div>© PillFly — use arrows or WASD to move. Space to pause.</div>
+  <div>© batpill — use arrows or WASD to move. Space to pause.</div>
     </footer>
   </div>
 </template>

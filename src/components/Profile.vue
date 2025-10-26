@@ -2,7 +2,7 @@
   <div class="profile-wrapper">
     <div class="profile-card">
       <div class="card-header">
-        <img src="@/gif/pillfly.gif" alt="pill" class="card-logo" />
+  <img src="@/images/batpill.png" alt="pill" class="card-logo" />
         <h2>Profile</h2>
       </div>
       <div v-if="userDoc" class="card-body">
@@ -59,7 +59,7 @@ export default {
   methods: {
     async share() {
       const uname = (this.userDoc && this.userDoc.username) ? this.userDoc.username : (store.user && store.user.username) ? store.user.username : 'Player'
-      const text = `I'm ${uname} and I collected ${this.userDoc.totalScore} scores in #PillFly`
+  const text = `I'm ${uname} and I collected ${this.userDoc.totalScore} scores in #batpill`
       try {
         const { generateShareImage, shareImageAndText } = await import('../utils/share')
         const blob = await generateShareImage({ username: uname, score: this.userDoc.totalScore || 0, medals: this.userDoc.medals || Math.floor(this.userDoc.totalScore/20) })

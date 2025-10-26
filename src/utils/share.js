@@ -18,10 +18,10 @@ export async function generateShareImage({ username = 'Player', score = 0, medal
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill()
   }
 
-  // draw pillfly gif/logo (first frame). Use local asset via new URL
+  // draw batpill image/logo. Use local asset via new URL
   try {
     const img = new Image()
-    img.src = new URL('../gif/pillfly.gif', import.meta.url).href
+    img.src = new URL('../images/batpill.png', import.meta.url).href
     await new Promise((res, rej) => { img.onload = res; img.onerror = rej })
     const logoSize = Math.min(220, Math.floor(width * 0.18))
     ctx.drawImage(img, width - logoSize - 48, 48, logoSize, logoSize)
@@ -43,7 +43,7 @@ export async function generateShareImage({ username = 'Player', score = 0, medal
   // Hashtag line
   ctx.font = '700 36px "Segoe UI", Roboto, Arial'
   ctx.fillStyle = '#bfe8a6'
-  ctx.fillText('#PillFly', 64, 300)
+  ctx.fillText('#batpill', 64, 300)
 
   // Medals
   ctx.fillStyle = '#ffd54f'
@@ -53,7 +53,7 @@ export async function generateShareImage({ username = 'Player', score = 0, medal
   // small footer
   ctx.fillStyle = 'rgba(255,255,255,0.7)'
   ctx.font = '400 20px "Segoe UI", Roboto, Arial'
-  ctx.fillText('Play now — Pillfly on pump.fun', 64, height - 48)
+  ctx.fillText('Play now — batpill on pump.fun', 64, height - 48)
 
   return await new Promise((res) => canvas.toBlob(res, 'image/png'))
 }

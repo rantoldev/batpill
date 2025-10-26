@@ -3,8 +3,8 @@
 <!-- Welcome / instructions overlay shown before game starts -->
 <div v-if="showWelcome" class="absolute inset-0 z-20 flex items-center justify-center ">
 <div class="welcome-box p-6 rounded-lg shadow-lg">
-<h2 class="text-4xl font-bold mb-4 text-white">Welcome to PillFly</h2>
-<p class="mb-4 text-white">Welcome to PillFly. Collect the s-points to gain scores. Avoid rocks and rockets. Use arrow keys or WASD to move. Press Space to pause.</p>
+<h2 class="text-4xl font-bold mb-4 text-white">Welcome to batpill</h2>
+<p class="mb-4 text-white">Welcome to batpill. Collect the b-points to gain scores. Avoid rocks and rockets. Use arrow keys or WASD to move. Press Space to pause.</p>
 <p class="mb-6 text-sm text-gray-300">Play as a guest to avoid saving scores, or log in to save your progress.</p>
 <div class="flex items-center justify-center space-x-4 mt-6">
 <template v-if="store.user">
@@ -34,7 +34,7 @@
 <div v-if="gameOver" class="absolute inset-0 flex items-center justify-center">
 <div class="welcome-box text-center p-8">
 <div class="text-4xl font-bold mb-4">
-Game Over{{ store.user ? ', ' + (store.user.username || store.user.email) : '!' }}
+Game Over{{ store.user ? ', ' + gameOverName : '!' }}
 </div>
 <div class="text-2xl mt-4 mb-6">Score: {{ score }}</div>
 <div class="flex items-center justify-center space-x-6">
@@ -88,7 +88,7 @@ fixedItemW: 300,           // fixed item sprite width when fixedSpriteSizes=true
 predictionTime: 5.0,       // longer prediction for better planning
 predictionStep: 0.1,       // finer steps for accurate simulation
 targetLockTime: 800        // slightly longer lock for stability
-  ,ignoreBottomPct: 0.08     // ignore s-points within bottom X% of screen (0.08 = 8%)
+  ,ignoreBottomPct: 0.08     // ignore b-points within bottom X% of screen (0.08 = 8%)
     ,hazardClearance: 60       // min px between intercept point and hazards to consider safe
 },
 autopilotTargetId: null,
@@ -119,15 +119,29 @@ autorestartTimer: null
 },
   // flag to ensure Game Over overlay shows during auto-restart window
   showGameOverOverlay: false,
-computed: {
-playerImg() {
-return new URL('@/gif/pillfly.gif', import.meta.url).href
-}
-},
+  computed: {
+    playerImg() {
+      return new URL('@/images/batpill.png', import.meta.url).href
+    },
+    // name to display on Game Over: prefer saved username, then displayName, then email local-part
+    gameOverName() {
+      try {
+        if (this.store && this.store.user) {
+          const u = this.store.user.username || this.store.user.displayName || (this.store.user.email ? this.store.user.email.split('@')[0] : null)
+          if (u) return u
+        }
+        const cu = auth.currentUser
+        if (cu) return cu.displayName || (cu.email ? cu.email.split('@')[0] : 'Player')
+      } catch (e) {
+        // fallback
+      }
+      return 'Player'
+    }
+  },
 methods: {
 getImg(type) {
-// keep using the existing s-point asset for visuals but items are called 's-point' in UI
-if (type === 's-point') return new URL('@/gif/s-point.gif', import.meta.url).href
+// keep using the existing b-point asset for visuals but items are called 'b-point' in UI
+if (type === 'b-point') return new URL('@/images/b-point.png', import.meta.url).href
 if (type === 'rock') return new URL('@/gif/rock.gif', import.meta.url).href
 if (type === 'rocket') return new URL('@/gif/rocket.gif', import.meta.url).href
 },
@@ -214,8 +228,8 @@ if (this.paused || this.gameOver) return
 const r = Math.random()
 // Make hazards (rock/rocket) more frequent than sols
 // r < 0.30 -> sol (30%), 0.30 <= r < 0.75 -> rock (45%), r >= 0.75 -> rocket (25%)
-let type = 's-point'
-if (r < 0.30) type = 's-point'
+let type = 'b-point'
+if (r < 0.30) type = 'b-point'
 else if (r < 0.75) type = 'rock'
 else type = 'rocket'
 const itemWidth = 60 // match --item-width default
@@ -232,11 +246,11 @@ speed: itemSpeed
 },
 
 spawnSol() {
-// Force spawn a s-point at a random X position with itemSpeed tuned
+// Force spawn a b-point at a random X position with itemSpeed tuned
 const itemWidth = 60
 const speedIncreaseSteps = Math.floor(this.score / 8)
 const itemSpeed = this.baseItemSpeed + speedIncreaseSteps * 0.9 + Math.random() * 1.2
-this.items.push({ id: this.idCounter++, type: 's-point', x: Math.random() * (window.innerWidth - itemWidth), y: -itemWidth, speed: itemSpeed })
+this.items.push({ id: this.idCounter++, type: 'b-point', x: Math.random() * (window.innerWidth - itemWidth), y: -itemWidth, speed: itemSpeed })
 },
 update() {
 if (this.paused || this.gameOver) return
@@ -259,13 +273,13 @@ const bottomLimit = window.innerHeight - 120 // allow going lower to collect ite
 // safety distance baseline — increase to keep a safer buffer from hazards
 const safetyDistance = 100
 
-// helper: predict if a given s-point is safe and feasible to collect
+// helper: predict if a given b-point is safe and feasible to collect
 const isSolSafe = (sol) => {
-// treat s-points that are above topLimit as not worth chasing
+// treat b-points that are above topLimit as not worth chasing
 if (sol.y < topLimit) return false
 
-// allow s-points near bottom if the autopilot simulation shows a safe intercept
-const hazards = this.items.filter(it => it.type !== 's-point')
+// allow b-points near bottom if the autopilot simulation shows a safe intercept
+const hazards = this.items.filter(it => it.type !== 'b-point')
 
 // Simulation parameters
 const dt = this.autopilotConfig.predictionStep
@@ -284,14 +298,14 @@ let simVelY = this.playerVel.y
 for (let step = 0; step <= steps; step++) {
 const t = step * dt
 
-// predict s-point position at time t
+// predict b-point position at time t
 const solPredX = sol.x
 const solPredY = sol.y + sol.speed * t
 
-// if s-point has fallen off screen, it's no longer collectible
+// if b-point has fallen off screen, it's no longer collectible
 if (solPredY > window.innerHeight + 30) return false
 
-// direction from sim player to predicted s-point
+// direction from sim player to predicted b-point
 const dx = solPredX - simX
 const dy = solPredY - simY
 const dist = Math.hypot(dx, dy) || 0.001
@@ -321,24 +335,24 @@ if (d < minSafeDist) return false
 }
 }
 
-// if simulation didn't reach the s-point within the prediction window, treat as unsafe
+// if simulation didn't reach the b-point within the prediction window, treat as unsafe
 return false
 }
 
-// select best feasible s-point using a scoring function (distance + time-to-catch + risk)
+// select best feasible b-point using a scoring function (distance + time-to-catch + risk)
 const bottomIgnoreY = window.innerHeight * (1 - (this.autopilotConfig.ignoreBottomPct || 0.08))
-// filter out s-points that are too close to the bottom (about to disappear)
-const sols = this.items.filter(it => it.type === 's-point' && (it.y <= bottomIgnoreY))
+// filter out b-points that are too close to the bottom (about to disappear)
+const sols = this.items.filter(it => it.type === 'b-point' && (it.y <= bottomIgnoreY))
 let best = null
 const evaluateSol = (s) => {
   // quick reject if it's above the header
   if (s.y < topLimit) return null
-  // ignore s-points that are within the bottom ignore area (almost disappearing)
+  // ignore b-points that are within the bottom ignore area (almost disappearing)
   if (s.y > bottomIgnoreY) return null
 
   // Interception-style, permissive feasibility check:
-  // Compute time until s-point falls off screen and estimated time for player to reach it.
-  const hazardsLocal = this.items.filter(it => it.type !== 's-point')
+  // Compute time until b-point falls off screen and estimated time for player to reach it.
+  const hazardsLocal = this.items.filter(it => it.type !== 'b-point')
   const maxSpeedSim = Math.max(6, this.autopilotRuntime.maxSpeed || 14)
   const solSpeed = Math.max(0.01, s.speed || 0)
   const timeUntilOff = (window.innerHeight - s.y) / solSpeed
@@ -356,7 +370,7 @@ const evaluateSol = (s) => {
   // if the predicted intercept is inside the ignored bottom area, don't attempt
   if (solPredY > bottomIgnoreY) return null
 
-  // check hazards at intercept time; only abort if a hazard will be almost exactly where the s-point will be
+  // check hazards at intercept time; only abort if a hazard will be almost exactly where the b-point will be
   let minHazardDist = Infinity
   for (const h of hazardsLocal) {
     const hPredX = h.x
@@ -373,7 +387,7 @@ const evaluateSol = (s) => {
   return { score, time: interceptT, minHazardDist }
 }
 
-// If nothing feasible was found, we'll fall back to chasing the nearest visible s-point
+// If nothing feasible was found, we'll fall back to chasing the nearest visible b-point
 for (const s of sols) {
   const res = evaluateSol(s)
   if (res) {
@@ -381,12 +395,12 @@ for (const s of sols) {
   }
 }
 
-// If we didn't find a feasible target, fall back to nearest s-point (aggressive behavior)
+// If we didn't find a feasible target, fall back to nearest b-point (aggressive behavior)
 if (!best) {
-  // consider any visible s-point but prefer those not in the ignored bottom region
+  // consider any visible b-point but prefer those not in the ignored bottom region
   let nearest = null
-  for (const s of this.items.filter(it => it.type === 's-point')) {
-    // skip s-points that are already in the bottom ignore area
+  for (const s of this.items.filter(it => it.type === 'b-point')) {
+  // skip b-points that are already in the bottom ignore area
     if (s.y > bottomIgnoreY) continue
     const dx = s.x - this.player.x
     const dy = s.y - this.player.y
@@ -396,7 +410,7 @@ if (!best) {
   // if we still didn't find anything (all sols are in the bottom area), allow nearest as fallback
   if (!nearest) {
     let fallback = null
-    for (const s of this.items.filter(it => it.type === 's-point')) {
+  for (const s of this.items.filter(it => it.type === 'b-point')) {
       const dx = s.x - this.player.x
       const dy = s.y - this.player.y
       const dist = Math.hypot(dx, dy)
@@ -434,7 +448,7 @@ this.autopilotTargetLockedAt = 0
 
 // steering with repulsion from hazards to maintain safetyDistance
 const repel = { x: 0, y: 0 }
-const hazards = this.items.filter(it => it.type !== 's-point')
+const hazards = this.items.filter(it => it.type !== 'b-point')
 for (const h of hazards) {
 const hx = h.x + (cssItemW / 2)
 const hy = h.y + (cssItemW / 2)
@@ -541,7 +555,7 @@ this.player.y += this.playerVel.y
 this.player.x = Math.max(0, Math.min(window.innerWidth - cssPlayerW, this.player.x))
 this.player.y = Math.max(topLimit, Math.min(bottomLimit, this.player.y))
 } else {
-// no safe s-point: compute an evasive desired velocity based on hazards and a smooth patrol
+// no safe b-point: compute an evasive desired velocity based on hazards and a smooth patrol
 // compute repulsion vector from hazards
 let repelHold = { x: 0, y: 0 }
 let nearestHazard = null
@@ -616,7 +630,7 @@ this.items.forEach(item => { item.y += item.speed })
 this.items = this.items.filter(item => item.y < window.innerHeight + 30)
 
 // Ensure at least a couple of sols exist so autopilot always has targets
-const activeSols = this.items.filter(it => it.type === 's-point' && it.y >= -120)
+const activeSols = this.items.filter(it => it.type === 'b-point' && it.y >= -120)
 const minSols = 2
 if (activeSols.length < minSols) {
 for (let i = 0; i < (minSols - activeSols.length); i++) this.spawnSol()
@@ -651,7 +665,7 @@ const iBottomT = iBottom - insetY
 
 const overlap = !(pRight < iLeftT || pLeft > iRightT || pBottom < iTopT || pTop > iBottomT)
 if (overlap) {
-if (item.type === 's-point') {
+if (item.type === 'b-point') {
 const prevScore = this.score
 this.score += 1
 store.setScore(this.score)
@@ -797,7 +811,7 @@ this.$router.push('/')
 shareOnX() {
 const username = (this.store.user && this.store.user.username) ? this.store.user.username : 'mbuser'
 const totalMedals = (this.store.user && typeof this.store.user.medals === 'number') ? this.store.user.medals : this.localMedals
-const text = `I'm ${username} and I collected ${this.score} scores and ${totalMedals} medals in #PillFly`
+  const text = `I'm ${username} and I collected ${this.score} scores and ${totalMedals} medals in #batpill`
 // try to generate an image and share it
 import('../utils/share').then(async mod => {
 try {
